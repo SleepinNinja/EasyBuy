@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Order Summary</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Serial No.</th>
+            <th scope="col">Item title</th>
+            <th scope="col">Item Price</th>
+            <th scope="col">
+            Item Quantity
+            
+          </th>
+            <th scope="col">Total Price</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for items in order.items.all %}
+        <tr>
+            <th scope="row">{{ forloop.counter }}</th>
+            <td>{{ items.item.title }}</td>
+            {% if items.item.discount_price %}
+              <td>{{ items.item.discount_price }}</td>
+            {% else %}
+              <td>{{ items.item.price }}</td>
+            {% endif %}
+            <td>
+               <a href="{% url 'core:add-one-item-to-cart' slug=items.item.slug %}"><i class="fas fa-plus"></i></a>
+              {{ items.quantity }}
+              <a href="{% url 'core:remove-one-item-from-cart' slug=items.item.slug %}"><i class="fas fa-minus"></i></a>
+                <a href="{% url 'core:remove-from-cart' slug=items.item.slug%}"><i class="fas fa-trash"></i></a>
+            </td>
+            <td>{{ items.get_final_price }}
+                {% if items.item.discount_price %}
+                <span class="badge badge-primary">Savings ${{ items.get_amount_saved }}</span>
+              </td>
+            {% endif %}
+        </tr>
+        {% empty %}
+        {% endfor %}
+        {% if order.coupon %}
+        <tr>
+            <td colspan="4"><b>Coupohdflkn<b/></td>
+            <td><b>-${{ order.coupon.amount}}</b></td>
+        </tr>
+        {% endif %}
+        {% if order.get_total_price %}
+        <tr>
+            <td colspan="4"><b>Order Total<b/></td>
+            <td><b>${{ order.get_total_price}}</b></td>
+        </tr>
+        <tr>
+            <td colspan="2"><a href="/" class="btn btn-info float-right">Continue Shopping</a></td>
+            <td colspan="2"><a href="/checkout/" class="btn btn-warning float-right">Proceed to Checkout</a></td>
+        </tr>
+        {% else %}
+          <tr>
+            <td><b>Your cart is empty</b></td>
+            <td colspan="2"><a href="/" class="btn btn-info float-right">Continue Shopping</a></td>
+        </tr>
+        {% endif %}
+    </tbody>
+</table>
+{% endblock content %}
